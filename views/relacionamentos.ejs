@@ -1,0 +1,136 @@
+<main class="container">
+  <h2>Relacionar Campos do WhatsApp</h2>
+
+  <form id="rel-form">
+    <table>
+      <thead>
+        <tr>
+          <th>Tabela</th>
+          <th>Campo da Tabela</th>
+          <th>Campo Destino</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <select name="nome_tabela" id="tabela-select" required>
+              <option value="">Selecione</option>
+              <option value="jlf_whatsapp">jlf_whatsapp</option>
+              <option value="jlf_whatsapp_2">jlf_whatsapp_2</option>
+            </select>
+          </td>
+          <td>
+            <select name="campo_tabela" id="campo-tabela-select" required>
+              <option value="">Selecione a tabela primeiro</option>
+            </select>
+          </td>
+          <td>
+            <select name="campo_destino" required>
+              <option value="">Selecione</option>
+              <option value="chave">Chave</option>
+              <option value="numero">Número</option>
+              <option value="mensagem">Mensagem</option>
+              <option value="data_envio">Data de Envio</option>
+            </select>
+          </td>
+          <td>
+            <button type="submit">Gravar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
+
+  <h3>Mapeamentos Existentes</h3>
+  <table id="mapeamentos">
+    <thead>
+      <tr>
+        <th>Tabela</th>
+        <th>Campo</th>
+        <th>Destino</th>
+        <th>Ação</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% mapeamentos.forEach(row => { %>
+        <tr data-id="<%= row.chave %>">
+          <td><%= row.nome_tabela %></td>
+          <td><%= row.campo_tabela %></td>
+          <td><%= row.campo_destino %></td>
+          <td><button onclick="excluir('<%= row.chave %>')">Excluir</button></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</main>
+
+<script>
+document.getElementById('tabela-select').addEventListener('change', async function () {
+  const tabela = this.value;
+  const campoSelect = document.getElementById('campo-tabela-select');
+  campoSelect.innerHTML = '<option value="">Carregando...</option>';
+
+  const res = await fetch(`/accounts/relacionamentos/campos?tabela=${tabela}`);
+  const campos = await res.json();
+
+  campoSelect.innerHTML = '<option value="">Selecione</option>';
+  campos.forEach(campo => {
+    const opt = document.createElement('option');
+    opt.value = campo;
+    opt.textContent = campo;
+    campoSelect.appendChild(opt);
+  });
+});
+
+// AJAX para salvar novo relacionamento
+document.getElementById('rel-form').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  const form = e.target;
+  const data = new URLSearchParams(new FormData(form));
+
+  const res = await fetch('/accounts/relacionamentos', {
+    method: 'POST',
+    body: data
+  });
+
+  if (res.ok) {
+    form.reset();
+    document.getElementById('campo-tabela-select').innerHTML = '<option value="">Selecione a tabela primeiro</option>';
+    carregarMapeamentos();
+  } else {
+    alert('Erro ao salvar');
+  }
+});
+
+async function carregarMapeamentos() {
+  const res = await fetch('/accounts/relacionamentos/lista');
+  const lista = await res.json();
+
+  const tbody = document.querySelector('#mapeamentos tbody');
+  tbody.innerHTML = '';
+
+  lista.forEach(row => {
+    const tr = document.createElement('tr');
+    tr.dataset.id = row.chave;
+    tr.innerHTML = `
+      <td>${row.nome_tabela}</td>
+      <td>${row.campo_tabela}</td>
+      <td>${row.campo_destino}</td>
+      <td><button onclick="excluir(${row.chave})">Excluir</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+async function excluir(chave) {
+  if (!confirm('Tem certeza que deseja excluir este mapeamento?')) return;
+
+  const res = await fetch(`/accounts/relacionamentos/${chave}`, { method: 'DELETE' });
+  if (res.ok) {
+    document.querySelector(`tr[data-id="${chave}"]`).remove();
+  } else {
+    alert('Erro ao excluir');
+  }
+}
+</script>

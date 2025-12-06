@@ -1,0 +1,32 @@
+<h1>Consultas WhatsApp</h1>
+<a href="/consultas/nova" class="btn">Nova Consulta</a>
+<table>
+  <thead>
+    <tr>
+      <th>Nome</th>
+      <th>Termos Aceitos</th>
+      <th>Tabela / Viewer</th>
+      <th>Ações</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (consultas.length === 0) { %>
+      <tr>
+        <td colspan="4">Nenhuma consulta configurada ainda.</td>
+      </tr>
+    <% } else { %>
+      <% consultas.forEach(c => { %>
+        <tr>
+          <td><%= c.nome %></td>
+          <td><%= c.termos %></td>
+          <td><%= c.tabela %></td>
+          <td>
+            <a href="/consultas/editar/<%= c.id %>">Editar</a>
+            <a href="/consultas/desativar/<%= c.id %>" onclick="return confirm('Desativar consulta?')">Desativar</a>
+          </td>
+        </tr>
+      <% }) %>
+    <% } %>
+  </tbody>
+
+</table>

@@ -1,0 +1,13 @@
+<div class="chat-container">
+  <% messages.forEach(msg => { %>
+    <div class="message <%= msg.tipo === 'enviado' ? 'sent' : 'received' %>">
+      <div class="meta">
+        <span class="phone"><%= msg.telefone %></span>
+        <span class="date"><%= new Date(msg.created_at).toLocaleString() %></span>
+      </div>
+      <div class="text">
+        <%= msg.mensagem %>
+      </div>
+    </div>
+  <% }) %>
+</div>

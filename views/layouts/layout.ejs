@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <h2 class="logo">WhatsApp Manager</h2>
+      <nav>
+        <ul>
+          <li><a href="/accounts">Contas WhatsApp</a></li>
+          <li><a href="/consultas">Consultas WhatsApp</a></li>
+          <li><a href="/painel/contatos-clientes">Contatos com Clientes</a></li>
+          <li><a href="/logout">Logout</a></li>
+        </ul>
+      </nav>
+    </aside>
+    <main class="content">
+      <%- body %>
+    </main>
+  </div>
+</body>
+</html>

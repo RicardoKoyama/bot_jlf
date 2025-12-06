@@ -1,0 +1,28 @@
+<a href="/accounts/nova">
+  <button style="margin-bottom: 1rem;">Incluir Nova Conta</button>
+</a>
+
+<table class="accounts">
+  <thead>
+    <tr>
+      <th>Conta</th>
+      <th>Status</th>
+      <th>Número</th>
+      <th>Ações</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% accounts.forEach(acc => { %>
+      <tr>
+        <td><%= acc.name %></td>
+        <td><span class="status status-<%= acc.status %>"><%= acc.status %></span></td>
+        <td><%= acc.phone_number || '--' %></td>
+        <td>
+          <form method="GET" action="/accounts/<%= acc.name %>/info" style="display:inline;">
+            <button type="submit">+ Info</button>
+          </form>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>

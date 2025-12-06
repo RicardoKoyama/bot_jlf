@@ -1,0 +1,66 @@
+<h1><%= consulta ? 'Editar' : 'Nova' %> Consulta</h1>
+
+<form action="/consultas/salvar" method="POST">
+  <% if (consulta) { %>
+    <input type="hidden" name="id" value="<%= consulta.id %>">
+  <% } %>
+
+  <label>Nome:</label>
+  <input type="text" name="nome" value="<%= consulta?.nome || '' %>" required>
+
+  <label>Termos (separados por vírgula):</label>
+  <input type="text" name="termos" value="<%= consulta?.termos || '' %>" required>
+
+  <label>Tabela:</label>
+  <select name="tabela" required onchange="fetchColunas(this.value)">
+    <option value="">-- Selecione uma tabela --</option>
+    <% tabelas.forEach(t => {
+         const nomeTabela = t.table_name || Object.values(t)[0]; %>
+      <option value="<%= nomeTabela %>" <%= nomeTabela === consulta?.tabela ? 'selected' : '' %>><%= nomeTabela %></option>
+    <% }) %>
+  </select>
+
+  <div id="campos-colunas">
+    <!-- Carregado via JavaScript -->
+  </div>
+
+  <label>Condições adicionais (opcional):</label>
+  <input type="text" name="condicoes_extra" value="<%= consulta?.condicoes_extra || '' %>">
+
+  <button type="submit">Salvar</button>
+</form>
+
+<script>
+async function fetchColunas(tabela) {
+  if (!tabela) return;
+
+  const res = await fetch(`/api/colunas/${tabela}`);
+  const { colunas } = await res.json();
+  const campos = document.getElementById('campos-colunas');
+
+  // Dados previamente salvos (modo edição)
+  const colunasSalvas = <%- JSON.stringify((consulta?.colunas || '').split(',')) %>;
+  const colunasLikeSalvas = <%- JSON.stringify((consulta?.colunas_like || '').split(',')) %>;
+
+  let html = '<label>Colunas a exibir:</label><br>';
+  colunas.forEach(c => {
+    const checked = colunasSalvas.includes(c) ? 'checked' : '';
+    html += `<input type="checkbox" name="colunas[]" value="${c}" ${checked}> ${c}<br>`;
+  });
+
+  html += '<br><label>Colunas para filtro LIKE:</label><br>';
+  colunas.forEach(c => {
+    const checked = colunasLikeSalvas.includes(c) ? 'checked' : '';
+    html += `<input type="checkbox" name="colunas_like[]" value="${c}" ${checked}> ${c}<br>`;
+  });
+
+  campos.innerHTML = html;
+}
+
+// Carregar automaticamente em modo edição
+<% if (consulta?.tabela) { %>
+  window.addEventListener('DOMContentLoaded', () => {
+    fetchColunas('<%= consulta.tabela %>');
+  });
+<% } %>
+</script>

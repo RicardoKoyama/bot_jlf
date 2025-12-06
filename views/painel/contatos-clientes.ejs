@@ -1,0 +1,39 @@
+<h1>Contatos com Clientes</h1>
+
+<form method="get" action="/painel/contatos-clientes" style="margin-bottom: 20px;">
+  <label for="periodo">Última compra:</label>
+  <select name="periodo" id="periodo" onchange="this.form.submit()">
+    <option value="atual" <%= periodoSelecionado === 'atual' ? 'selected' : '' %>>Mês atual</option>
+    <option value="3m" <%= periodoSelecionado === '3m' ? 'selected' : '' %>>Últimos 3 meses</option>
+    <option value="6m" <%= periodoSelecionado === '6m' ? 'selected' : '' %>>Últimos 6 meses</option>
+    <option value="1a" <%= periodoSelecionado === '1a' ? 'selected' : '' %>>Último ano</option>
+  </select>
+</form>
+
+<table>
+  <thead>
+    <tr>
+      <th>Cliente</th>
+      <th>Telefone</th>
+      <th>Vendedor</th>
+      <th>Total Vendas</th>
+      <th>Última Venda</th>
+      <th>Último Contato</th>
+      <th>Tipo Contato</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% contatos.forEach(contato => { %>
+      <tr>
+        <td><%= contato.nome_cliente %></td>
+        <td><%= contato.telefone_cliente %></td>
+        <td><%= contato.nome_vendedor %></td>
+        <td><%= contato.total_vendas %></td>
+        <td><%= contato.ultima_venda ? new Date(contato.ultima_venda).toLocaleDateString() : '' %></td>
+        <td><%= contato.data_ultimo_contato ? new Date(contato.data_ultimo_contato).toLocaleDateString() : '—' %></td>
+        <td><%= contato.tipo_contato || '—' %></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+

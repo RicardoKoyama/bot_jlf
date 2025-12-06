@@ -1,0 +1,22 @@
+<main class="container">
+  <h2>Informações da Conta: <%= account.account_name %></h2>
+  
+  <p><strong>Nome:</strong> <%= account.account_name %></p>
+  <p><strong>Telefone:</strong> <%= account.phone_number %></p>
+  <p><strong>Status:</strong> <%= account.status %></p>
+  <p><strong>Criado em:</strong> <%= account.created_at %></p>
+  <p><strong>Último Status:</strong> <%= account.updated_at %></p>
+  <p><strong>Ativa:</strong> <%= account.is_active ? 'Sim' : 'Não' %></p>
+
+  <% if (qrCode) { %>
+    <h3>QR Code</h3>
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=<%= qrCode %>" alt="QR Code">
+  <% } else { %>
+    <p>QR Code não disponível.</p>
+  <% } %>
+
+  <form method="POST" action="/accounts/<%= account.account_name %>/desativar" onsubmit="return confirm('Deseja realmente desativar essa conta?')">
+    <button type="submit" style="background-color: red; color: white;">Excluir Conta</button>
+  </form>
+</main>
+
