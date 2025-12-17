@@ -13,11 +13,14 @@ async function gerarGraficoPizza(dados, titulo, legenda) {
     labels = dados.map(item => item.vendedor);
   }
   
-  const valores = dados.map(item => 
+  const valores = dados.map(item =>
     Number(
-      String(item.faturamento).replace(/\./g, '').replace(',', '.')
-    )
+      String(item.faturamento)
+        .replace(/,/g, '')
+        .trim()
+    ) || 0
   );
+
 
   const backgroundColors = [
     '#FF6384',
