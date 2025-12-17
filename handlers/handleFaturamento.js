@@ -66,8 +66,7 @@ function buildFaturamentoMessage(faturamento, dataInicio, dataFim) {
     // faturamento vem como string formatada (ex: " 20,501.01")
     const valorNumerico = Number(
       String(item.faturamento)
-        .replace(/\./g, '')
-        .replace(',', '.')
+        .replace(/,/g, '')
         .trim()
     ) || 0;
 
