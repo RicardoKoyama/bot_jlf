@@ -54,13 +54,39 @@ function buildFaturamentoMessage(faturamento, dataInicio, dataFim) {
 
   if (faturamento.length === 0) {
     response += 'Nenhum dado de faturamento encontrado no período.';
-  } else {
-    faturamento.forEach((item, index) => {
-      response += `*${item.local.trim()}*\n`;
-      response += `💰 Faturamento: R$ ${item.faturamento}\n`;
-      response += `📦 Saídas: ${item.saidas}\n\n`;
-    });
+    return response;
   }
+
+  let totalSaidas = 0;
+  let totalFaturamento = 0;
+
+  faturamento.forEach((item) => {
+    const saidas = Number(item.saidas) || 0;
+
+    // faturamento vem como string formatada (ex: " 20,501.01")
+    const valorNumerico = Number(
+      String(item.faturamento)
+        .replace(/\./g, '')
+        .replace(',', '.')
+        .trim()
+    ) || 0;
+
+    totalSaidas += saidas;
+    totalFaturamento += valorNumerico;
+
+    response += `*${item.local.trim()}*\n`;
+    response += `💰 Faturamento: R$ ${item.faturamento}\n`;
+    response += `📦 Saídas: ${item.saidas}\n\n`;
+  });
+
+  const totalFormatado = totalFaturamento.toLocaleString('pt-BR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+  response += `📊 *TOTAL DO PERÍODO*\n`;
+  response += `💰 Faturamento Total: R$ ${totalFormatado}\n`;
+  response += `📦 Total de Saídas: ${totalSaidas}\n`;
 
   return response;
 }
