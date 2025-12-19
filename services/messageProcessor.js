@@ -4,6 +4,9 @@ const { log } = require('../utils/logger');
 const { getClient } = require('./whatsappClient');
 
 async function ensureChat(accountName, number) {
+
+  console.log(`Garantindo chat para ${number} na conta ${accountName}`);
+
   try {
     const client = getClient(accountName);
     if (!client) return;
@@ -25,6 +28,9 @@ async function ensureChat(accountName, number) {
 }
 
 const processMessage = async (id, channel) => {
+
+  console.log(`Processando mensagem ID ${id} do canal ${channel}`);
+  
   try {
     const messageData = await getMessageById(id, channel);
 
