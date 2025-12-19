@@ -44,7 +44,7 @@ const processMessage = async (id, channel) => {
       return;
     }
 
-    const contaWhatsApp = messageData.conta_whatsapp || 'default';
+    const contaWhatsApp = messageData.conta_whatsapp || 'Comunicacao';
 
     await ensureChat(contaWhatsApp, messageData.numero);
 
