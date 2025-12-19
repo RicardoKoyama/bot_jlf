@@ -1,6 +1,28 @@
 const { getMessageById, updateMessageStatus } = require('./dbService');
 const { sendMessage } = require('./messageService');
 const { log } = require('../utils/logger');
+const { getClient } = require('./whatsappClient');
+
+async function ensureChat(accountName, number) {
+  try {
+    const client = getClient(accountName);
+    if (!client) return;
+
+    const jid = number.replace(/\D/g, '').startsWith('55')
+      ? `${number.replace(/\D/g, '')}@c.us`
+      : `55${number.replace(/\D/g, '')}@c.us`;
+
+    const chat = await client.getChatById(jid).catch(() => null);
+
+    if (!chat) {
+      log(`[${accountName}] Chat inexistente para ${jid}, forçando criação`);
+      await client.sendMessage(jid, ' ');
+      await new Promise(r => setTimeout(r, 400));
+    }
+  } catch (err) {
+    log(`[${accountName}] Erro no ensureChat (${number}): ${err.message}`);
+  }
+}
 
 const processMessage = async (id, channel) => {
   try {
@@ -12,6 +34,8 @@ const processMessage = async (id, channel) => {
     }
 
     const contaWhatsApp = messageData.conta_whatsapp || 'default';
+
+    await ensureChat(contaWhatsApp, messageData.numero);
 
     const response = await sendMessage(
       contaWhatsApp,
