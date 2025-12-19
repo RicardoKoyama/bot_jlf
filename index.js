@@ -73,7 +73,7 @@ require('dotenv').config();
 
   pgClient.on('notification', async (msg) => {
     const id = parseInt(msg.payload, 10);
-    log(`Recebida notificação do Postgres [canal=${msg.channel}]: id=${id}`);
+    log(`Recebida notificação do PG  [canal=${msg.channel}]: id=${id}`);
     await processMessage(id, msg.channel);
   });
 
