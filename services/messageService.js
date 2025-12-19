@@ -5,6 +5,22 @@ const { getClient } = require('./whatsappClient');
 const { log } = require('../utils/logger');
 const { enqueueMessage } = require('./messageQueue');
 
+async function ensureChat(client, jid, accountName) {
+  try {
+    const chat = await client.getChatById(jid).catch(() => null);
+
+    if (!chat) {
+      log(`[${accountName}] Chat inexistente para ${jid}, forçando criação`);
+      // mensagem mínima para forçar criação do lid
+      await client.sendMessage(jid, ' ');
+      // pequeno delay para o WhatsApp Web estabilizar
+      await new Promise(r => setTimeout(r, 400));
+    }
+  } catch (err) {
+    log(`[${accountName}] Falha ao garantir chat para ${jid}: ${err.message}`);
+  }
+}
+
 const sendMessage = async (accountName, number, message, messageId, filePath = null) => {
   if (accountName === 'Cobranca') {
     enqueueMessage(accountName, number, message, messageId);
@@ -19,6 +35,11 @@ const sendMessage = async (accountName, number, message, messageId, filePath = n
       log(`Cliente WhatsApp não encontrado para conta ${accountName}`);
       return null;
     }
+
+    const jid = formattedphoneNumber;
+
+    // 🔐 AQUI É O PONTO EXATO DA CORREÇÃO
+    await ensureChat(client, jid, accountName);
 
     let response;
 
