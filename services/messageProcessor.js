@@ -9,11 +9,16 @@ async function ensureChat(accountName, number) {
 
   try {
     const client = getClient(accountName);
+
+    console.log(`Cliente obtido: ${client ? 'sim' : 'não'}`);
+
     if (!client) return;
 
     const jid = number.replace(/\D/g, '').startsWith('55')
       ? `${number.replace(/\D/g, '')}@c.us`
       : `55${number.replace(/\D/g, '')}@c.us`;
+
+    console.log(`JID formatado: ${jid}`);
 
     const chat = await client.getChatById(jid).catch(() => null);
 
@@ -30,7 +35,7 @@ async function ensureChat(accountName, number) {
 const processMessage = async (id, channel) => {
 
   console.log(`Processando mensagem ID ${id} do canal ${channel}`);
-  
+
   try {
     const messageData = await getMessageById(id, channel);
 
