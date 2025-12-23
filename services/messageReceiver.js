@@ -25,7 +25,8 @@ const allowedNumbers = new Set([
  * ⚠️ Usar apenas quando o telefone não puder ser resolvido
  */
 const allowedLIDs = new Set([
-  '32087751000096@lid'
+  '32087751000096@lid',
+  '41764849213594@lid'
 ]);
 
 /**
