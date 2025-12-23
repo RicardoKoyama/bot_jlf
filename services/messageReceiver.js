@@ -7,13 +7,14 @@ const { handleLoteQuickReply } = require('../handlers/handleDecodifica');
  * Telefones autorizados (formato: DDI + DDD + número, sem @)
  */
 const allowedNumbers = new Set([
-  '5514996665935',
+  '5514996665935', /* ricardo */
+  '5514997624313', /* taty */
   '5514998122657',
   '5514991182979',
   '5514996301756',
   '5514996973391',
   '5514996320098',
-  '5514997624313',
+  
   '5514997022068',
   '5514991183231',
   '5514996716116',
@@ -25,8 +26,9 @@ const allowedNumbers = new Set([
  * ⚠️ Usar apenas quando o telefone não puder ser resolvido
  */
 const allowedLIDs = new Set([
-  '32087751000096@lid',
-  '41764849213594@lid'
+  '32087751000096@lid', /* ricardo */
+  '25430602059930@lid', /* taty */
+
 ]);
 
 /**
