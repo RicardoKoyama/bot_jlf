@@ -34,8 +34,6 @@ async function ensureChat(accountName, number) {
 
 const processMessage = async (id, channel) => {
 
-  console.log(`Processando mensagem ID ${id} do canal ${channel}`);
-
   try {
     const messageData = await getMessageById(id, channel);
 
@@ -43,6 +41,8 @@ const processMessage = async (id, channel) => {
       log(`Nenhum registro encontrado para ID ${id}`);
       return;
     }
+
+    console.log(`Conta WhatsApp: ${messageData.conta_whatsapp}`);
 
     const contaWhatsApp = messageData.conta_whatsapp || 'default';
 
