@@ -9,8 +9,9 @@ const { handleLoteQuickReply } = require('../handlers/handleDecodifica');
 const allowedNumbers = new Set([
   '5514996665935', /* ricardo */
   '5514997624313', /* taty */
+  '5514991182979', /* netto */
   '5514998122657',
-  '5514991182979',
+  
   '5514996301756',
   '5514996973391',
   '5514996320098',
@@ -28,6 +29,7 @@ const allowedNumbers = new Set([
 const allowedLIDs = new Set([
   '32087751000096@lid', /* ricardo */
   '25430602059930@lid', /* taty */
+  '135192819835025@lid',  /* netto */
 
 ]);
 
