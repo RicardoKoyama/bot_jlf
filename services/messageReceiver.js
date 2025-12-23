@@ -1,102 +1,151 @@
 const { pool } = require('./accountService');
 const { log } = require('../utils/logger');
 const { processAutomation, processAutomationImage } = require('./automationRouter');
-const { handleLoteQuickReply } = require('../handlers/handleDecodifica'); // 👈 importa
+const { handleLoteQuickReply } = require('../handlers/handleDecodifica');
 
+/**
+ * Telefones autorizados (formato: DDI + DDD + número, sem @)
+ */
+const allowedNumbers = new Set([
+  '5514996665935',
+  '5514998122657',
+  '5514991182979',
+  '5514996301756',
+  '5514996973391',
+  '5514996320098',
+  '5514997624313',
+  '5514997022068',
+  '5514991183231',
+  '5514996716116',
+  '5514981153889'
+]);
+
+/**
+ * LIDs autorizados (fallback operacional)
+ * ⚠️ Usar apenas quando o telefone não puder ser resolvido
+ */
+const allowedLIDs = new Set([
+  '32087751000096@lid'
+]);
+
+/**
+ * Tenta normalizar o remetente para número de telefone real.
+ * Retorna string (5514...) ou null se não for possível.
+ */
 function normalizeFromNumber(message) {
-  // Caso normal
+  // Caso padrão
   if (message.from.endsWith('@c.us')) {
     return message.from.replace('@c.us', '');
   }
 
-  // Caso LID → tentar extrair telefone real
+  // Caso LID
   if (message.from.endsWith('@lid')) {
-    // tenta usar o "author" ou "fromMe" context
-    if (message._data?.notifyName && message._data?.id?.participant) {
+    // tenta extrair participante real
+    if (message._data?.id?.participant?.endsWith('@c.us')) {
       return message._data.id.participant.replace('@c.us', '');
     }
 
-    // fallback: se tiver chat associado
+    // fallback pelo chat associado
     if (message._data?.chat?.id?.user) {
       return `55${message._data.chat.id.user}`;
     }
 
-    return null; // não conseguiu resolver
+    return null;
   }
 
   return null;
 }
 
-
 async function handleIncomingMessage(message, accountName, accountId, client) {
   try {
+    // 🔕 Ignorar grupos
     if (message.from.endsWith('@g.us')) return;
+
+    // 🔕 Ignorar contas específicas
     if (accountName === 'Cobranca') return;
     if (accountName === 'Principal') return;
 
+    const rawFrom = message.from;
     const fromNumber = normalizeFromNumber(message);
 
-    if (!fromNumber) {
-      log(`[${accountName}] Não foi possível normalizar remetente: ${message.from}`);
+    /**
+     * 🔐 AUTORIZAÇÃO
+     */
+    let autorizado = false;
+
+    // Prioridade: telefone real
+    if (fromNumber && allowedNumbers.has(fromNumber)) {
+      autorizado = true;
+    }
+
+    // Fallback: LID explícito
+    if (!autorizado && rawFrom.endsWith('@lid') && allowedLIDs.has(rawFrom)) {
+      autorizado = true;
+    }
+
+    if (!autorizado) {
+      if (rawFrom.endsWith('@lid') && !allowedLIDs.has(rawFrom)) {
+        log(`[${accountName}] LID novo detectado (não autorizado): ${rawFrom}`);
+      } else {
+        log(`[${accountName}] Mensagem bloqueada de remetente não autorizado: ${rawFrom}`);
+      }
       return;
     }
 
-
-    const allowedNumbers = new Set([
-      '5514996665935','5514998122657','5514991182979','5514996301756', '5514996973391', '5514996320098',
-      '5514997624313','5514997022068','5514991183231','5514996716116', '5514981153889'
-    ]);
-    if (!allowedNumbers.has(fromNumber)) {
-      log(`[${accountName}] Mensagem bloqueada de número não autorizado: ${fromNumber}`);
-      return;
-    }
-
+    /**
+     * 🚀 FLUXO DA CONTA COMUNICACAO
+     */
     if (accountName === 'Comunicacao') {
-      // ✅ 1) Sempre tenta tratar fluxo de lote (1/2 + nome), com ou sem quoted #LCHK
+
+      // 1️⃣ Quick reply de lote (1/2 + nome)
       try {
-        // sempre tenta quick reply de lote ANTES de qualquer tratamento de reply
         const handled = await handleLoteQuickReply(message);
         if (handled) {
-          // opcional: registrar no jlf_whatsapp se quiser
           if (message.hasQuotedMsg) {
             const quoted = await message.getQuotedMessage();
             await pool.query(
-              `UPDATE jlf_whatsapp SET resposta=$1, status='RESPONDIDO' WHERE message_id=$2 AND status NOT ILIKE 'RESPONDIDO'`,
+              `UPDATE jlf_whatsapp
+                  SET resposta = $1,
+                      status   = 'RESPONDIDO'
+                WHERE message_id = $2
+                  AND status NOT ILIKE 'RESPONDIDO'`,
               [message.body, quoted.id._serialized]
             );
           }
           return;
         }
-
       } catch (e) {
         log(`[${accountName}] handleLoteQuickReply erro: ${e.message}`);
       }
 
-      // 2) Caso não tenha sido um quick reply de lote, segue sua lógica atual de replies genéricos
+      // 2️⃣ Reply genérico a mensagem enviada
       if (message.hasQuotedMsg) {
         const quoted = await message.getQuotedMessage();
         const quotedId = quoted.id._serialized;
-        const updateQuery = `
-          UPDATE jlf_whatsapp
-             SET resposta = $1,
-                 status   = 'RESPONDIDO'
-           WHERE message_id = $2
-             AND status NOT ILIKE 'RESPONDIDO'
-        `;
-        await pool.query(updateQuery, [message.body, quotedId]);
+
+        await pool.query(
+          `UPDATE jlf_whatsapp
+              SET resposta = $1,
+                  status   = 'RESPONDIDO'
+            WHERE message_id = $2
+              AND status NOT ILIKE 'RESPONDIDO'`,
+          [message.body, quotedId]
+        );
+
         log(`[${accountName}] Resposta registrada no banco para message_id ${quotedId}.`);
         return;
       }
 
-      // 3) Imagens → roteador de imagem
+      // 3️⃣ Imagens
       if (message.type === 'image') {
         await processAutomationImage(message, accountId, client);
         return;
       }
 
-      // 4) Texto normal → roteador padrão
+      // 4️⃣ Texto padrão
       await processAutomation(message, accountId, client);
     }
+
   } catch (error) {
     console.error(`[${accountName}] Erro ao processar mensagem recebida: ${error.message}`);
   }
