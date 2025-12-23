@@ -3,13 +3,45 @@ const { log } = require('../utils/logger');
 const { processAutomation, processAutomationImage } = require('./automationRouter');
 const { handleLoteQuickReply } = require('../handlers/handleDecodifica'); // 👈 importa
 
+function normalizeFromNumber(message) {
+  // Caso normal
+  if (message.from.endsWith('@c.us')) {
+    return message.from.replace('@c.us', '');
+  }
+
+  // Caso LID → tentar extrair telefone real
+  if (message.from.endsWith('@lid')) {
+    // tenta usar o "author" ou "fromMe" context
+    if (message._data?.notifyName && message._data?.id?.participant) {
+      return message._data.id.participant.replace('@c.us', '');
+    }
+
+    // fallback: se tiver chat associado
+    if (message._data?.chat?.id?.user) {
+      return `55${message._data.chat.id.user}`;
+    }
+
+    return null; // não conseguiu resolver
+  }
+
+  return null;
+}
+
+
 async function handleIncomingMessage(message, accountName, accountId, client) {
   try {
     if (message.from.endsWith('@g.us')) return;
     if (accountName === 'Cobranca') return;
     if (accountName === 'Principal') return;
 
-    const fromNumber = message.from.replace('@c.us', '');
+    const fromNumber = normalizeFromNumber(message);
+
+    if (!fromNumber) {
+      log(`[${accountName}] Não foi possível normalizar remetente: ${message.from}`);
+      return;
+    }
+
+
     const allowedNumbers = new Set([
       '5514996665935','5514998122657','5514991182979','5514996301756', '5514996973391', '5514996320098',
       '5514997624313','5514997022068','5514991183231','5514996716116', '5514981153889'
