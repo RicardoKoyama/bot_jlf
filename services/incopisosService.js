@@ -106,17 +106,17 @@ async function consultaEstoquePorRef(ref) {
       }
     });
   }
-/*
+
   // --- 🧾 Caso sem resultados: salva o HTML para debug ---
   if (!resultados.length) {
-    const filePath = "/home/ubuntu/apis/whatsapp-bot/saida_incopisos_debug.html";
+    const filePath = "/home/ubuntu/apis/saida_incopisos_debug.html";
     fs.writeFileSync(filePath, html, "utf8");
     console.warn(
       `⚠️ Nenhum dado de estoque encontrado para ref ${ref}. HTML salvo em: ${filePath}`
     );
     return null;
   }
-*/ 
+
   // --- Formatação da resposta ---
   const cabecalho = `🏗️ Estoque IncoPisos – Produto ${resultados[0].produto}`;
   const linhasFmt = resultados
