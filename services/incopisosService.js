@@ -106,7 +106,7 @@ async function consultaEstoquePorRef(ref) {
       }
     });
   }
-
+/*
   // --- 🧾 Caso sem resultados: salva o HTML para debug ---
   if (!resultados.length) {
     const filePath = "/home/ubuntu/apis/whatsapp-bot/saida_incopisos_debug.html";
@@ -116,7 +116,7 @@ async function consultaEstoquePorRef(ref) {
     );
     return null;
   }
-
+*/ 
   // --- Formatação da resposta ---
   const cabecalho = `🏗️ Estoque IncoPisos – Produto ${resultados[0].produto}`;
   const linhasFmt = resultados
