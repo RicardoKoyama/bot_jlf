@@ -14,7 +14,7 @@ async function ensureChat(client, jid, accountName) {
       // mensagem mínima para forçar criação do lid
       await client.sendMessage(jid, ' ');
       // pequeno delay para o WhatsApp Web estabilizar
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise(r => setTimeout(r, 800));
     }
   } catch (err) {
     log(`[${accountName}] Falha ao garantir chat para ${jid}: ${err.message}`);

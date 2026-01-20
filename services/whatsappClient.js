@@ -8,9 +8,22 @@ const { handleIncomingMessage } = require('./messageReceiver');
 const clients = {};
 const qrCodes = {};
 
+function applySendSeenFix(client, accountName) {
+  try {
+    client.pupPage?.evaluate(() => {
+      if (window?.WWebJS) {
+        // Neutraliza o sendSeen quebrado após update do WhatsApp Web
+        window.WWebJS.sendSeen = async () => {};
+      }
+    });
+    log(`[${accountName}] Patch sendSeen aplicado com sucesso`);
+  } catch (err) {
+    log(`[${accountName}] Falha ao aplicar patch sendSeen: ${err.message}`);
+  }
+}
+
 const initializeClients = async (accounts) => {
   for (const account of accounts) {
-    const sessionFolder = account.session_folder;
     const accountName = account.account_name;
     const accountId = account.id;
 
@@ -31,6 +44,9 @@ const initializeClients = async (accounts) => {
     client.on('ready', () => {
       log(`[${accountName}] Cliente WhatsApp está pronto!`);
       updateAccountStatus(accountId, 'PRONTO', 'Cliente pronto para uso.');
+
+      // 🔧 PATCH CRÍTICO CONTRA BUG markedUnread / sendSeen
+      applySendSeenFix(client, accountName);
     });
 
     client.on('auth_failure', (msg) => {
@@ -48,13 +64,11 @@ const initializeClients = async (accounts) => {
     });
 
     client.initialize();
-
     clients[accountName] = client;
   }
 };
 
 const createAndStartClient = async (account) => {
-  const sessionFolder = account.session_folder;
   const accountName = account.account_name;
   const accountId = account.id;
 
@@ -75,6 +89,9 @@ const createAndStartClient = async (account) => {
   client.on('ready', () => {
     log(`[${accountName}] Cliente WhatsApp está pronto!`);
     updateAccountStatus(accountId, 'PRONTO', 'Cliente pronto para uso.');
+
+    // 🔧 PATCH CRÍTICO CONTRA BUG markedUnread / sendSeen
+    applySendSeenFix(client, accountName);
   });
 
   client.on('auth_failure', (msg) => {
@@ -92,10 +109,8 @@ const createAndStartClient = async (account) => {
   });
 
   client.initialize();
-
   clients[accountName] = client;
 };
-
 
 const getClient = (accountName) => {
   return clients[accountName];
