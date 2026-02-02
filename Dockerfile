@@ -2,7 +2,6 @@ FROM node:20.20-bullseye
 
 WORKDIR /app
 
-# Dependências do sistema
 RUN apt-get update && apt-get install -y \
   ca-certificates \
   fonts-liberation \
@@ -28,15 +27,14 @@ RUN apt-get update && apt-get install -y \
   xdg-utils \
   --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
-# 🔑 cria usuário não-root
 RUN useradd -m botuser
 
-# garante permissão
+COPY package*.json ./
+
 RUN chown -R botuser:botuser /app
 
 USER botuser
 
-COPY package*.json ./
 RUN npm install --legacy-peer-deps
 
 COPY . .
