@@ -4,6 +4,7 @@ const { log } = require('../utils/logger');
 
 
 const processMessage = async (id, channel) => {
+  console.log(`Iniciando processamento da mensagem ID ${id} no canal ${channel}`);
 
   try {
     const messageData = await getMessageById(id, channel);
