@@ -2,7 +2,7 @@ FROM node:20.20-bullseye
 
 WORKDIR /app
 
-# Dependências nativas necessárias (canvas + chromium)
+# Dependências do sistema
 RUN apt-get update && apt-get install -y \
   ca-certificates \
   fonts-liberation \
@@ -28,19 +28,21 @@ RUN apt-get update && apt-get install -y \
   xdg-utils \
   --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
-# Copia manifests
-COPY package*.json ./
+# 🔑 cria usuário não-root
+RUN useradd -m botuser
 
-# Instala dependências exatamente como no PM2
+# garante permissão
+RUN chown -R botuser:botuser /app
+
+USER botuser
+
+COPY package*.json ./
 RUN npm install --legacy-peer-deps
 
-# Copia o código
 COPY . .
 
-# Porta do painel
 EXPOSE 3000
 
-# Libs do Inlite
 ENV LD_LIBRARY_PATH="/app/inlite/bin:/usr/lib/x86_64-linux-gnu"
 
 CMD ["node", "index.js"]
