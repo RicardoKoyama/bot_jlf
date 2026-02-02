@@ -5,7 +5,8 @@ function getClient(accountName) {
 
   return new Client({
     authStrategy: new LocalAuth({
-      dataPath: `./sessions/${accountName}`,
+      clientId: accountName,      // 🔑 identifica a conta
+      dataPath: '/app/sessions'   // 🔑 raiz única de sessões
     }),
     puppeteer: {
       headless: true,
