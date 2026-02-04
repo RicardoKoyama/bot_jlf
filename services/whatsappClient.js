@@ -63,7 +63,12 @@ const initializeClients = async (accounts) => {
       await handleIncomingMessage(message, accountName, accountId, client);
     });
 
-    client.initialize();
+    await new Promise((resolve, reject) => {
+      client.once('ready', () => resolve());
+      client.once('auth_failure', msg => reject(new Error(msg)));
+      client.initialize();
+    });
+
     clients[accountName] = client;
   }
 };
