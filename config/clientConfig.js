@@ -8,7 +8,7 @@ function getClient(accountName) {
     }),
     puppeteer: {
       headless: true,
-      // 🚫 NÃO definir executablePath
+      protocolTimeout: 120000,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',

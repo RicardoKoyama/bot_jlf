@@ -7,15 +7,16 @@ const { enqueueMessage } = require('./messageQueue');
 
 async function ensureChat(client, jid, accountName) {
   try {
-    const chat = await client.getChatById(jid).catch(() => null);
-
+    console.log(`[${accountName}] Trecho ignorado`);
+    //const chat = await client.getChatById(jid).catch(() => null);
+    /*
     if (!chat) {
       log(`[${accountName}] Chat inexistente para ${jid}, forçando criação`);
       // mensagem mínima para forçar criação do lid
       await client.sendMessage(jid, ' ');
       // pequeno delay para o WhatsApp Web estabilizar
       await new Promise(r => setTimeout(r, 800));
-    }
+    }*/ 
   } catch (err) {
     log(`[${accountName}] Falha ao garantir chat para ${jid}: ${err.message}`);
   }
