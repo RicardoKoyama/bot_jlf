@@ -4,7 +4,7 @@ function getClient(accountName) {
   return new Client({
     authStrategy: new LocalAuth({
       clientId: accountName,
-       dataPath: `/app/sessions/${accountName}`
+      dataPath: '/app/sessions'
     }),
     puppeteer: {
       headless: true,
