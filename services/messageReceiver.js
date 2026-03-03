@@ -61,6 +61,8 @@ async function handleIncomingMessage(message, accountName, accountId, client) {
 
     const autorizado = await isAuthorized(rawFrom, fromNumber);
 
+    console.log(`[${accountName}] Mensagem recebida de ${rawFrom} (normalized: ${fromNumber}) - Autorizado: ${autorizado}`);
+
     if (!autorizado) {
       log(`[${accountName}] Tentativa de acesso não autorizado: ${rawFrom}`);
       return;
