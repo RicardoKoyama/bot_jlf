@@ -26,20 +26,16 @@ function normalizeFromNumber(message) {
   return null;
 }
 
-/**
- * Consulta autorização no banco
- */
-async function isAuthorized(rawFrom, fromNumber) {
+async function isAuthorized(rawFrom) {
   try {
     const { rows } = await pool.query(
       `
       SELECT 1
         FROM usuarios u
-       WHERE (u.cp_whatsapp = $1)
-          OR (u.cp_whatsapplid = $2)
+       WHERE u.cp_whatsapplid = $1
        LIMIT 1
       `,
-      [fromNumber, rawFrom]
+      [rawFrom]
     );
 
     return rows.length > 0;
@@ -59,9 +55,9 @@ async function handleIncomingMessage(message, accountName, accountId, client) {
     const rawFrom = message.from;
     const fromNumber = normalizeFromNumber(message);
 
-    console.log(`[${accountName}] Mensagem recebida de ${rawFrom} (número: ${fromNumber})`);
-    
-    const autorizado = await isAuthorized(rawFrom, fromNumber);
+    console.log(`[${accountName}] Mensagem recebida de ${rawFrom}`);
+
+    const autorizado = await isAuthorized(rawFrom);
 
     if (!autorizado) {
       log(`[${accountName}] Tentativa de acesso não autorizado: ${rawFrom}`);
