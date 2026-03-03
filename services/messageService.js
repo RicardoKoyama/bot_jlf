@@ -7,7 +7,6 @@ const { enqueueMessage } = require('./messageQueue');
 
 async function ensureChat(client, jid, accountName) {
   try {
-    console.log(`[${accountName}] Trecho ignorado`);
     //const chat = await client.getChatById(jid).catch(() => null);
     /*
     if (!chat) {
@@ -39,7 +38,6 @@ const sendMessage = async (accountName, number, message, messageId, filePath = n
 
     const jid = formattedphoneNumber;
 
-    // 🔐 AQUI É O PONTO EXATO DA CORREÇÃO
     await ensureChat(client, jid, accountName);
 
     let response;
