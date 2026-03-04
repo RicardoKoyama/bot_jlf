@@ -109,11 +109,13 @@ async function consultaEstoquePorRef(ref) {
 
   // --- 🧾 Caso sem resultados: salva o HTML para debug ---
   if (!resultados.length) {
-    const filePath = "/app/saida_incopisos_debug.html";
+    const filePath = "/tmp/saida_incopisos_debug.html";
     fs.writeFileSync(filePath, html, "utf8");
+
     console.warn(
       `⚠️ Nenhum dado de estoque encontrado para ref ${ref}. HTML salvo em: ${filePath}`
     );
+
     return null;
   }
 
