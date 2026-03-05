@@ -76,7 +76,7 @@ async function searchDeltaProducts(searchTerm) {
         nome, 
         referenciafabrica 
       FROM produtos 
-      WHERE nome ILIKE $1 AND marca = 391
+      WHERE nome ILIKE $1 AND marca in (391, 837)
       LIMIT 20
     `;
 
