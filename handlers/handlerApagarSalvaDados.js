@@ -27,4 +27,28 @@ async function handleApagarSalvaDados(message, accountId, nomeUsuario) {
   }
 }
 
-module.exports = { handleApagarSalvaDados };
+async function handleCPProfissional(message, accountId, nomeUsuario) {
+  try {
+    const user = (nomeUsuario || '').trim();
+    if (!user) {
+      await message.reply('❗ Informe o fisica juridica do profissional. Ex.: JT 28668');
+      return true;
+    }
+
+    log(`[BOT] [JT] Ativando o profissional: ${user}`);
+
+    const result = await pool.query(
+      'update fisicajuridica set cp_profissional = true where fisicajuridica = $1',
+      [user]
+    );
+
+    await message.reply(`✅ ${result.rowCount} registro(s) ativado(s) para o profissional "${user}".`);
+    return true;
+  } catch (err) {
+    log(`[BOT] [JT] Erro: ${err.message}`);
+    await message.reply('❗ Ocorreu um erro ao ativar o profissional.');
+    return true;
+  }
+}
+
+module.exports = { handleApagarSalvaDados, handleCPProfissional };
