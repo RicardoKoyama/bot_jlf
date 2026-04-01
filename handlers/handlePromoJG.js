@@ -1,19 +1,11 @@
 const { pool } = require('../services/dbService');
 
-async function handlePromoJG(message, accountId, whatsappClients) {
-  const client = whatsappClients[accountId];
+async function handlePromoJG(message, accountId) {
   console.log('[PROMOJG] Mensagem recebida:', message.body);
-
-  if (!client) {
-    console.error(`[PROMOJG] Cliente não encontrado para conta ${accountId}`);
-    await message.reply('❗ Erro interno. Cliente WhatsApp não localizado.');
-    return;
-  }
 
   const body = message.body.trim().toLowerCase();
 
-  // comando esperado: promo 12345
-  if (!body.startsWith('promo ')) return false;
+  if (!body.startsWith('promo ') && !body.startsWith('JT ')) return false;
 
   const partes = body.split(' ');
   const codigo = partes[1];
@@ -32,7 +24,7 @@ async function handlePromoJG(message, accountId, whatsappClients) {
     if (result.rowCount === 0) {
       await message.reply(`⚠️ Profissional ${codigo} não encontrado.`);
     } else {
-      await message.reply(`✅ Profissional ${codigo} atualizado como *profissional* com sucesso.`);
+      await message.reply(`✅ Profissional ${codigo} atualizado com sucesso.`);
     }
 
     console.log(`[PROMOJG] Profissional ${codigo} atualizado.`);
