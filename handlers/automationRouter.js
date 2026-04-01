@@ -32,6 +32,8 @@ async function processAutomation(message, accountId, client) {
         return;
     }
 
+    console.log(`[BOT] Comando reconhecido: ${text} -> Handler: ${todasConsultas.handler}}`);
+
     const exigeParametro = todasConsultas.exige_parametro;
     const termosArray = String(todasConsultas.termos)
         .split(',')
@@ -52,6 +54,8 @@ async function processAutomation(message, accountId, client) {
     }
 
     const handlerName = todasConsultas.handler || 'handleGenerico';
+
+    console.log(`[BOT] Executando handler: ${handlerName} para o comando: ${text}`);
 
     switch (handlerName) {
       case 'handleFaturamento':
