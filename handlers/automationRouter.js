@@ -7,7 +7,8 @@ const { getConsultaByTermo } = require('../db/consultas');
 const { log } = require('../utils/logger');
 const { handleCPI } = require('../handlers/handleProdInativo');
 const { handleDecodifica } = require('../handlers/handleDecodifica');
-const { handleApagarSalvaDados, handleCPProfissional } = require('../handlers/handlerApagarSalvaDados');
+const { handleApagarSalvaDados } = require('../handlers/handlerApagarSalvaDados');
+const { handlePromoJG } = require('../handlers/handlePromoJG');
 
 async function processAutomation(message, accountId, client) {
     const text = message.body.trim();
@@ -73,8 +74,8 @@ async function processAutomation(message, accountId, client) {
         await handleApagarSalvaDados(message, accountId, termoBuscado, { [accountId]: client });
         break;
 
-      case 'handleCPProfissional':
-        await handleCPProfissional(message, accountId, termoBuscado, { [accountId]: client });
+      case 'handlePromoJG':
+        await handlePromoJG(message, accountId, termoBuscado, { [accountId]: client });
         break;
 
       case 'handleGenerico':

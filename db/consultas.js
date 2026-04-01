@@ -15,6 +15,8 @@ async function getConsultaByTermo(mensagem) {
 
         const consultas = resultado.rows;
 
+        console.log(`[BOT] Consultas ativas encontradas: ${resultado.rows}`);
+
         for (const consulta of consultas) {
             const termos = consulta.termos.split(',').map(t => t.trim().toUpperCase());
             for (const termo of termos) {
