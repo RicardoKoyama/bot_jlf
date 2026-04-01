@@ -7,7 +7,7 @@ const { getConsultaByTermo } = require('../db/consultas');
 const { log } = require('../utils/logger');
 const { handleCPI } = require('../handlers/handleProdInativo');
 const { handleDecodifica } = require('../handlers/handleDecodifica');
-const { handleApagarSalvaDados } = require('../handlers/handlerApagarSalvaDados');
+const { handleApagarSalvaDados, handleCPProfissional } = require('../handlers/handlerApagarSalvaDados');
 
 async function processAutomation(message, accountId, client) {
     const text = message.body.trim();
