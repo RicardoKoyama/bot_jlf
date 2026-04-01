@@ -13,6 +13,7 @@ const { handleTelefoneResposta } = require('../handlers/orcamentoVendaHandler');
 const { atualizarOuExcluirItemDoOrcamento } = require('../handlers/orcamentoVendaHandler');
 const { handleIncoPisos } = require('../handlers/handleIncoPisos');
 const { handleEmbramaco } = require('../handlers/handlerEmbramaco');
+const { handlePromoJG } = require('../handlers/handlePromoJG');
 
 async function processAutomation(message, accountId, client) {
     const text = message.body.trim();
@@ -85,6 +86,10 @@ async function processAutomation(message, accountId, client) {
 
       case 'handleApagarSalvaDados':
         await handleApagarSalvaDados(message, accountId, termoBuscado, { [accountId]: client });
+        break;
+
+      case 'handlePromoJG':
+        await handlePromoJG(message, accountId, termoBuscado, { [accountId]: client });
         break;
 
       case 'handleIncopisos':
