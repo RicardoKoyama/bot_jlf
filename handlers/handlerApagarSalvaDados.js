@@ -28,6 +28,7 @@ async function handleApagarSalvaDados(message, accountId, nomeUsuario) {
 }
 
 async function handleCPProfissional(message, accountId, nomeUsuario) {
+  console.log('handleCPProfissional chamado com:', { nomeUsuario });
   try {
     const user = (nomeUsuario || '').trim();
     if (!user) {

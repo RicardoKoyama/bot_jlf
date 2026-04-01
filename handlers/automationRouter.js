@@ -73,6 +73,10 @@ async function processAutomation(message, accountId, client) {
         await handleApagarSalvaDados(message, accountId, termoBuscado, { [accountId]: client });
         break;
 
+      case 'handleCPProfissional':
+        await handleCPProfissional(message, accountId, termoBuscado, { [accountId]: client });
+        break;
+
       case 'handleGenerico':
       default:
         await handleGenerico(message, accountId, termoBuscado, { [accountId]: client }, todasConsultas);
