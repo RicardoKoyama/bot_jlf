@@ -5,7 +5,7 @@ async function handlePromoJG(message, accountId) {
 
   const body = message.body.trim().toLowerCase();
 
-  if (!body.startsWith('promo ') && !body.startsWith('JT ')) return false;
+  if (!body.startsWith('promo ') && !body.startsWith('jt ')) return false;
 
   const partes = body.split(' ');
   const codigo = partes[1];

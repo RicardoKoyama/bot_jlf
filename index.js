@@ -60,26 +60,44 @@ require('dotenv').config();
 
   await initializeClients(accounts);
 
-  // Escuta NOTIFY do Postgres
-  const pgClient = new Client({
-    connectionString: process.env.PG_CONNECTION_STRING,
-  });
+  // Escuta NOTIFY do Postgres com lógica de reconexão
+  async function startPgListener() {
+    const pgClient = new Client({
+      connectionString: process.env.PG_CONNECTION_STRING,
+    });
 
-  await pgClient.connect();
+    pgClient.on('error', (err) => {
+      console.error('Erro no client PG (Conexão interrompida):', err.message);
+      // O client emite 'error' e encerra quando a conexão cai.
+      // Removemos os listeners antigos para evitar vazamentos antes de tentar reconectar
+      pgClient.removeAllListeners();
+      pgClient.end().catch(() => {});
+      
+      log('Tentando reconectar ao Postgres em 5 segundos...');
+      setTimeout(startPgListener, 5000);
+    });
 
-  pgClient.on('error', (err) => {
-    console.error('Erro no client PG:', err);
-  });
+    pgClient.on('notification', async (msg) => {
+      try {
+        const id = parseInt(msg.payload, 10);
+        log(`Recebida notificação do PG [canal=${msg.channel}]: id=${id}`);
+        await processMessage(id, msg.channel);
+      } catch (err) {
+        console.error('Erro ao processar notificação:', err);
+      }
+    });
 
-  pgClient.on('notification', async (msg) => {
-    const id = parseInt(msg.payload, 10);
-    log(`Recebida notificação do PG  [canal=${msg.channel}]: id=${id}`);
-    await processMessage(id, msg.channel);
-  });
+    try {
+      await pgClient.connect();
+      await pgClient.query('LISTEN msg_whatsapp');
+      log('Escutando Postgres (canal: msg_whatsapp)...');
+    } catch (err) {
+      console.error('Erro ao conectar listener do PG:', err.message);
+      setTimeout(startPgListener, 5000);
+    }
+  }
 
-  await pgClient.query('LISTEN msg_whatsapp');
-
-  log('Escutando Postgres...');
+  await startPgListener();
 
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
